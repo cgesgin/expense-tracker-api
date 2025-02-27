@@ -21,7 +21,7 @@ public class UserService implements IUserService{
     @Override
     public User save(User user) {
 
-        if (user.getId()==null) {
+        if (user.getId()!=null) {
             user.setId(null);
         }
         

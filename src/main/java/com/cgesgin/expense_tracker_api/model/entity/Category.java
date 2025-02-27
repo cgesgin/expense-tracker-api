@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,20 +19,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "category")
+public class Category {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(name = "username" ,unique = true)
-    private String username;
-    
-    @Column(name="password")
-    private String password;
+
+    private String name;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "user")
+    @ManyToMany(mappedBy = "categories")
     private List<Expense> expenses;
 }

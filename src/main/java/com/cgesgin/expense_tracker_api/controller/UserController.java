@@ -18,7 +18,7 @@ import com.cgesgin.expense_tracker_api.config.security.JwtUtil;
 import com.cgesgin.expense_tracker_api.model.dto.DataResponse;
 import com.cgesgin.expense_tracker_api.model.dto.TokenResponse;
 import com.cgesgin.expense_tracker_api.model.entity.User;
-import com.cgesgin.expense_tracker_api.service.UserService;
+import com.cgesgin.expense_tracker_api.model.service.IUserService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -27,12 +27,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "User", description = "API for User operations")
 public class UserController {
 
-    private UserService userService;
+    private IUserService userService;
     private AuthenticationManager authenticationManager;
     private JwtUtil jwtUtil;
     private UserDetailsService userDetailsService;
     
-    public UserController(UserService userService, AuthenticationManager authenticationManager, JwtUtil jwtUtil,
+    public UserController(IUserService userService, AuthenticationManager authenticationManager, JwtUtil jwtUtil,
             UserDetailsService userDetailsService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
