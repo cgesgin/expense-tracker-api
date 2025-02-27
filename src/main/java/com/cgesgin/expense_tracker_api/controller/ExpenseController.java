@@ -9,10 +9,12 @@ import com.cgesgin.expense_tracker_api.model.entity.Expense;
 import com.cgesgin.expense_tracker_api.model.service.ICategoryService;
 import com.cgesgin.expense_tracker_api.model.service.IExpenseService;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,9 +59,21 @@ public class ExpenseController {
     }
 
     @GetMapping("/expenses")
-    public ResponseEntity<DataResponse<List<Expense>>> getAllExpenses() {
-        List<Expense> expenses = expenseService.getAll();
+    public ResponseEntity<DataResponse<List<Expense>>> getAllExpenses(
+            @RequestParam(value = "period", required = false) String period,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
+
+        List<Expense> expenses;
         DataResponse<List<Expense>> response = new DataResponse<>();
+
+        if (period != null) {
+            expenses = expenseService.getExpensesByPeriod(period);
+        } else if (startDate != null && endDate != null) {
+            expenses = expenseService.findByDateRange(startDate, endDate);
+        }else{
+            expenses = expenseService.getAll();
+        }
         response.setData(expenses);
         response.setMessage(HttpStatus.OK.toString());
         return ResponseEntity.ok(response);
@@ -92,7 +106,8 @@ public class ExpenseController {
     }
 
     @PostMapping("/expenses/{expenseId}/categories/{categoryId}")
-    public ResponseEntity<DataResponse<Expense>> addCategoryToExpense(@PathVariable Long expenseId, @PathVariable Long categoryId) {
+    public ResponseEntity<DataResponse<Expense>> addCategoryToExpense(@PathVariable Long expenseId,
+            @PathVariable Long categoryId) {
         Expense expense = expenseService.getById(expenseId);
         Category category = categoryService.getById(categoryId);
         DataResponse<Expense> response = new DataResponse<>();
@@ -113,7 +128,8 @@ public class ExpenseController {
     }
 
     @DeleteMapping("/expenses/{expenseId}/categories/{categoryId}")
-    public ResponseEntity<DataResponse<Expense>> removeCategoryFromExpense(@PathVariable Long expenseId, @PathVariable Long categoryId) {
+    public ResponseEntity<DataResponse<Expense>> removeCategoryFromExpense(@PathVariable Long expenseId,
+            @PathVariable Long categoryId) {
         Expense expense = expenseService.getById(expenseId);
         DataResponse<Expense> response = new DataResponse<>();
         if (expense == null || expense.getCategories() == null) {

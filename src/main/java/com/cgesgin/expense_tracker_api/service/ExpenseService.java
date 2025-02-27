@@ -1,5 +1,6 @@
 package com.cgesgin.expense_tracker_api.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,17 +12,17 @@ import org.springframework.stereotype.Service;
 import com.cgesgin.expense_tracker_api.model.entity.Expense;
 import com.cgesgin.expense_tracker_api.model.entity.User;
 import com.cgesgin.expense_tracker_api.model.service.IExpenseService;
-import com.cgesgin.expense_tracker_api.repository.ExpenceRepository;
+import com.cgesgin.expense_tracker_api.repository.ExpenseRepository;
 import com.cgesgin.expense_tracker_api.repository.UserRepository;
 
 @Service
 public class ExpenseService implements IExpenseService {
 
-    private ExpenceRepository expenceRepository;
+    private ExpenseRepository expenseRepository;
     private UserRepository userRepository;
 
-    public ExpenseService(ExpenceRepository expenceRepository, UserRepository userRepository) {
-        this.expenceRepository = expenceRepository;
+    public ExpenseService(ExpenseRepository expenseRepository, UserRepository userRepository) {
+        this.expenseRepository = expenseRepository;
         this.userRepository = userRepository;
     }
 
@@ -45,7 +46,7 @@ public class ExpenseService implements IExpenseService {
         if (user != null) {
             expense.setUser(user);
             System.out.println(expense.toString());
-            return expenceRepository.save(expense);
+            return expenseRepository.save(expense);
         }
         return null;
     }
@@ -53,9 +54,9 @@ public class ExpenseService implements IExpenseService {
     @Override
     public Expense update(Expense expense) {
         User user = getAuthenticatedUser();
-        if (user != null && expenceRepository.findById(expense.getId()).isPresent()) {
+        if (user != null && expenseRepository.findById(expense.getId()).isPresent()) {
             expense.setUser(user);
-            return expenceRepository.save(expense);
+            return expenseRepository.save(expense);
         }
         return null;
     }
@@ -64,7 +65,7 @@ public class ExpenseService implements IExpenseService {
     public List<Expense> getAll() {
         User user = getAuthenticatedUser();
         if (user != null) {
-            return expenceRepository.findAll()
+            return expenseRepository.findAll()
                     .stream()
                     .filter(expense -> expense.getUser().getId().equals(user.getId()))
                     .collect(Collectors.toList());
@@ -75,8 +76,8 @@ public class ExpenseService implements IExpenseService {
     @Override
     public boolean delete(Expense expense) {
         User user = getAuthenticatedUser();
-        if (user != null && expenceRepository.findById(expense.getId()).isPresent()) {
-            expenceRepository.delete(expense);
+        if (user != null && expenseRepository.findById(expense.getId()).isPresent()) {
+            expenseRepository.delete(expense);
             return true;
         }
         return false;
@@ -85,9 +86,32 @@ public class ExpenseService implements IExpenseService {
     @Override
     public Expense getById(Long id) {
         User user = getAuthenticatedUser();
-        return expenceRepository.findById(id)
+        return expenseRepository.findById(id)
                 .filter(expense -> expense.getUser().getId().equals(user.getId()))
                 .orElse(null);
+    }
+
+    @Override
+    public List<Expense> findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        return expenseRepository.findByDateRange(startDate, endDate);
+    }
+
+    public List<Expense> getExpensesByPeriod(String period) {
+        
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = LocalDateTime.now();
+
+        if ("past_week".equals(period)) {
+            startDate = LocalDateTime.now().minusWeeks(1);
+        } else if ("past_month".equals(period)) {
+            startDate = LocalDateTime.now().minusMonths(1);
+        } else if ("last_3_months".equals(period)) {
+            startDate = LocalDateTime.now().minusMonths(3);
+        } else {
+            return expenseRepository.findAll();
+        }
+
+        return expenseRepository.findByDateRange(startDate, endDate);
     }
 
 }

@@ -36,4 +36,12 @@ public class User {
     @JsonIgnore
     @ManyToMany(mappedBy = "user")
     private List<Expense> expenses;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                '}';
+    }
 }
