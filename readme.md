@@ -1,5 +1,5 @@
 ## 🎯 Overview
-Solution to the roadmap.sh project https://roadmap.sh/projects/texpense-tracker-api
+Solution to the roadmap.sh project https://roadmap.sh/projects/expense-tracker-api
 
 ## 🛠️ Technical Details
 
